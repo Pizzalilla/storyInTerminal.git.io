@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terminal Story</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #2c3e50, #34495e);
+      color: #00ff99;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .terminal-wrapper {
+      position: relative;
+      background: rgba(26, 26, 26, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      box-shadow: 0 0 25px rgba(0, 255, 153, 0.25);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 950px;
+      height: 670px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .controls {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .controls span {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .close-btn { background: #ff5f56; }
+
+    .reset-btn {
+      position: absolute;
+      top: 6px;
+      right: 12px;
+      font-size: 0.85rem;
+      color: #00ff99;
+      background: transparent;
+      border: 1px solid #00ff99;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 2px 10px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    #terminal {
+      white-space: pre-wrap;
+      border: 2px solid #00ff99;
+      padding: 1.25rem;
+      flex-grow: 1;
+      overflow-y: auto;
+      border-radius: 10px;
+      background-color: #000000;
+      font-size: 1.15rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 1rem;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: #00ff99 #1a1a1a;
+    }
+
+    #input-area {
+      display: flex;
+      align-items: center;
+    }
+
+    #input-label {
+      color: #4FC3F7;
+      margin-right: 0.4rem;
+    }
+
+    #user-input {
+      background-color: transparent;
+      border: none;
+      outline: none;
+      color: #FFD54F;
+      font-family: inherit;
+      font-size: 1rem;
+      flex: 1;
+      caret-color: #FFD54F;
+    }
+
+    .modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #111;
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      display: none;
+      z-index: 1000;
+      width: 320px;
+      text-align: center;
+    }
+
+    .modal button {
+      margin: 1rem 0.5rem 0 0.5rem;
+      background: #00ff99;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal-wrapper">
+    <div class="controls">
+      <span class="close-btn" onclick="openModal()"></span>
+    </div>
+    <button class="reset-btn" onclick="resetTerminal()">Reset</button>
+    <div id="terminal">
+      <div><span style="color:#4FC3F7">user@reader</span>:~$ <span style="color:#FFD54F">Type <span style="color:#82AAFF"><strong>run story.start</strong></span> to begin...</span></div>
+    </div>
+    <div id="input-area">
+      <span id="input-label">user@reader:~$</span>
+      <input type="text" id="user-input" autofocus />
+    </div>
+    <div class="modal" id="closeModal">
+      <p>You really don't wanna listen to my story? 😭</p>
+      <button onclick="closeModalBox()">I will read it</button>
+      <button onclick="closeModalBox()">You can't leave, you will read it 💻</button>
+    </div>
+  </div>
+
+  <script>
+    const terminal = document.getElementById("terminal");
+    const inputField = document.getElementById("user-input");
+    let actShown = 0;
+    let isTyping = false;
+
+    const acts = {
+      "story.start": [
+        "For a while, I focused mostly on finishing tasks. Assignments, coding projects — as long as I submitted something that met the requirements, I considered it done. I got the work done and received what most would call “good results,” but I didn’t feel satisfied with any of it. I always thought it could be way better.",
+        "Over time, I started avoiding the harder parts of thinking. Whenever I hit a roadblock, I’d lean on AI tools instead of researching or breaking down the problem myself. It kept things moving, but it made me feel like I was just assembling answers, not understanding them.",
+        "As that continued, I started losing confidence in my own coding ability. I began to second-guess myself constantly — whether the logic I wrote was sound, whether I was missing something obvious. That low confidence made me feel dependent on AI, like I needed to check what it would say before trusting my own thoughts. Coding started to feel more like stitching things together than building something I understood or believed in.",
+        "That quiet doubt built up over time, and it wasn’t until much later that I realized how disconnected I had become from the work I used to enjoy.",
+        `<br><span style="color:#4FC3F7">user@reader</span>:~$ <span style="color:#FFD54F">Type <span style="color:#82AAFF"><strong>run story.change</strong></span> to continue.</span>`
+      ],
+      "story.change": [
+        "I decided to stop relying on shortcuts and try doing things properly. I picked a project and wrote every part of the code myself — no AI, no rushing. It took more time, but I understood what I was doing. I could debug it, explain it, and improve it. That was the first time in a while I felt like I had created something solid.",
+        "Since then, I’ve tried to hold myself to a higher standard. I still use tools when needed, but only after I’ve made a serious attempt on my own. I care more about how I work, not just whether something is finished. That mindset shift — insisting on better, even when “good enough” would pass — has stuck with me.",
+        `<br><span style="color:#4FC3F7">user@reader</span>:~$ <span style="color:#FFD54F">Type <span style="color:#82AAFF"><strong>run story.next</strong></span> to continue.</span>`
+      ],
+      "story.next": [
+        "I’m still not as confident as I used to be, but I know I’m far ahead of where I once was — and that’s enough for now. I’ve learned to measure growth not by perfection, but by progress. As long as I’m better than I was last time, I’m moving forward.",
+        "What changed was more than just my work ethic — it was how I think. I started to dive deep instead of rushing the surface, and held myself to higher standards because I knew I could do better.",
+        "I’m applying to the Apple Foundation Program because I want to keep building on this momentum — to keep learning, keep improving, and keep creating with intention. I think this program is the perfect environment to do just that."
+      ]
+    };
+
+    function appendCommand(cmd) {
+      const line = document.createElement("div");
+      line.innerHTML = `<span style="color:#4FC3F7">user@reader</span>:~$ <span style="color:#FFD54F">${cmd}</span>`;
+      terminal.appendChild(line);
+    }
+
+    function typeText(lines, callback) {
+      isTyping = true;
+      const all = lines.join("\n\n");
+      const out = document.createElement("div");
+      out.style.color = "#00ff99";
+      out.innerHTML = "";
+      terminal.appendChild(out);
+      let i = 0;
+      function typeChar() {
+        if (i < all.length) {
+          out.innerHTML += all.charAt(i);
+          i++;
+          terminal.scrollTop = terminal.scrollHeight;
+          setTimeout(typeChar, 6);
+        } else {
+          isTyping = false;
+          if (callback) callback();
+        }
+      }
+      typeChar();
+    }
+
+    inputField.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !isTyping) {
+        const input = inputField.value.trim();
+        inputField.value = "";
+        if (!input) return;
+
+        appendCommand(input);
+
+        if (input === "run story.start" && actShown === 0) {
+          const storyLines = acts["story.start"].slice(0, -1);
+          typeText(storyLines, () => {
+            const htmlLine = document.createElement("div");
+            htmlLine.innerHTML = acts["story.start"][acts["story.start"].length - 1];
+            terminal.appendChild(htmlLine);
+            actShown = 1;
+          });
+        } else if (input === "run story.change" && actShown === 1) {
+          const storyLines = acts["story.change"].slice(0, -1);
+          const htmlLine = document.createElement("div");
+          htmlLine.innerHTML = acts["story.change"][acts["story.change"].length - 1];
+          typeText(storyLines, () => {
+            terminal.appendChild(htmlLine);
+            actShown = 2;
+          });
+        } else if (input === "run story.next" && actShown === 2) {
+          const storyLines = acts["story.next"].slice(0, -1);
+          const htmlLine = document.createElement("div");
+          htmlLine.innerHTML = acts["story.next"][acts["story.next"].length - 1];
+          typeText(storyLines, () => {
+            terminal.appendChild(htmlLine);
+            actShown = 3;
+          });
+        } else if (actShown >= 2) {
+          const err = document.createElement("div");
+          err.style.color = "#EF5350";
+          err.textContent = "Error L1F3: Nothing more to say.";
+          terminal.appendChild(err);
+        } else {
+          const err = document.createElement("div");
+          err.style.color = "#EF5350";
+          err.textContent = "Error CMD404: Unknown command. Please follow the instructions.";
+          terminal.appendChild(err);
+        }
+      }
+    });
+
+    function resetTerminal() {
+      terminal.innerHTML = `<div><span style="color:#4FC3F7">user@reader</span>:~$ <span style="color:#FFD54F">Type <span style="color:#82AAFF"><strong>run story.start</strong></span> to begin...</span></div>`;
+      actShown = 0;
+      inputField.value = "";
+    }
+
+    function openModal() {
+      document.getElementById("closeModal").style.display = "block";
+    }
+
+    function closeModalBox() {
+      document.getElementById("closeModal").style.display = "none";
+      const response = document.createElement("div");
+      response.innerHTML = `<span style="color:#FFD54F">user@reader</span>:~$ I'm glad you stayed 🙂`;
+      terminal.appendChild(response);
+    }
+  </script>
+</body>
+</html>
